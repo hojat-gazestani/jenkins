@@ -1,5 +1,8 @@
 # jenkins
 
+### Jenkins configuration
+
+```text
 plugin kubernetes
 Manage Jenkins > Nodes and Cloud > Cloud > add new cloud > kubernetes
     kubernetes cloud details
@@ -18,12 +21,10 @@ Manage Jenkins > Nodes and Cloud > Cloud > add new cloud > kubernetes
                 Docker image: jenkins/inbound-agent:latest
 
 newJob
-    name: pullGit
+    name: agenttest
     type: Pipeline
-        Restrict where this project can be run
-            Label Expression: kubeagent
 
-        Pipeline
+    Pipeline
 
         pipeline {
         agent {
@@ -34,9 +35,8 @@ newJob
                 steps {
                     container('jnlp'){
                         git branch: 'main', url: "https://github.com/hojat-gazestani/myapp.git"
-                    }
-                    
+                    }   
                 }
             }
         }
-}
+    }
