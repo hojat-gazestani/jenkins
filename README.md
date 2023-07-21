@@ -22,13 +22,21 @@ Manage Jenkins > Nodes and Cloud > Cloud > add new cloud > kubernetes
 
 newJob
     name: agenttest
-    type: Freestyle project
-        Restrict where this project can be run
-            Label Expression: kubeagent
+    type: Pipeline
 
-        Build Steps
-            Execute shell: 
-                command:
-                    echo "hollo form pod"
+    Pipeline
 
-```
+        pipeline {
+        agent {
+            label "kubeagent"
+        }
+        stages {
+            stage('Git clone') {
+                steps {
+                    container('jnlp'){
+                        git branch: 'main', url: "https://github.com/hojat-gazestani/myapp.git"
+                    }   
+                }
+            }
+        }
+    }
