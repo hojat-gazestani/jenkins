@@ -1,0 +1,1 @@
+kubectl create secret docker-registry docker-credentials --docker-username=hojatgazni --docker-password=<your-secret> --docker-email=hojatgazestani@gmail.com --namespace devops-tools

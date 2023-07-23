@@ -1,8 +1,3 @@
-# jenkins
-
-### Jenkins configuration
-
-```text
 plugin kubernetes
 Manage Jenkins > Nodes and Cloud > Cloud > add new cloud > kubernetes
     kubernetes cloud details
@@ -19,24 +14,3 @@ Manage Jenkins > Nodes and Cloud > Cloud > add new cloud > kubernetes
             Containers
                 Name: jnlp
                 Docker image: jenkins/inbound-agent:latest
-
-newJob
-    name: agenttest
-    type: Pipeline
-
-    Pipeline
-
-        pipeline {
-        agent {
-            label "kubeagent"
-        }
-        stages {
-            stage('Git clone') {
-                steps {
-                    container('jnlp'){
-                        git branch: 'main', url: "https://github.com/hojat-gazestani/myapp.git"
-                    }   
-                }
-            }
-        }
-    }

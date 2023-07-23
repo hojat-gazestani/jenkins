@@ -1,17 +1,56 @@
-
-
+def COMMIT_ID=''
 pipeline {
-    agent {
-        label "kubeagent"
+  agent {
+    kubernetes {
+      yaml """
+kind: Pod
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - sleep
+    args:
+    - 9999999
+    volumeMounts:
+      - name: jenkins-docker-cfg
+        mountPath: /kaniko/.docker
+  volumes:
+  - name: jenkins-docker-cfg
+    projected:
+      sources:
+      - secret:
+          name: docker-credentials
+          items:
+            - key: .dockerconfigjson
+              path: config.json
+"""
     }
-    stages {
-        stage('Git clone') {
-            steps {
-                container('jnlp'){
-                    git branch: 'main', url: "https://github.com/hojat-gazestani/myapp.git"
-                }
-                
-            }
+  }
+  stages {
+    stage('Git clone') {
+      steps {
+        container('jnlp'){
+          git branch: 'main', url: "https://github.com/hojat-gazestani/myapp.git"
+
+          script {
+            GIT_ID = sh (
+              script: "git log -n 1 --pretty=format:'%H'",
+              returnStdout: true)
+          }
+        }    
+      }
+    }
+    stage('Build with Kaniko') {
+      steps {
+        container(name: 'kaniko', shell: '/busybox/sh') {
+          sh """#!/busybox/sh
+            echo "FROM jenkins/inbound-agent:latest" > Dockerfile
+            /kaniko/executor --context `pwd` --destination hojatgazni/hello-kaniko:$COMMIT_ID
+          """
         }
+      }
     }
+  }
 }
